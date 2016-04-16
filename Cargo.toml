@@ -1,0 +1,19 @@
+[package]
+name = "morse_code"
+version = "0.1.0"
+authors = ["jad340 <jad340@openmailbox.org>"]
+
+[lib]
+name = "morse_code"
+path = "src/lib.rs"
+
+[[bin]]
+name = "morse"
+path = "src/main.rs"
+
+[dependencies]
+phf = "*"
+phf_macros = "*"
+docopt = "*"
+docopt_macros = "*"
+rustc-serialize = "*"
