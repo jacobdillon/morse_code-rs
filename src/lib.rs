@@ -56,8 +56,7 @@ static CHARACTER_TO_MORSE: phf::Map<char, &'static str> = phf_map! {
     ' ' => "/",
 };
 
-// Look up a character in the map, returning the morse code translation if found
-// and "" if not
+// Look up a character in the map, returning its morse code translation
 fn translate_char_to_morse(c: char) -> Option<String> {
     if CHARACTER_TO_MORSE.contains_key(&c) {
         Some(CHARACTER_TO_MORSE.get(&c).unwrap().to_string())
@@ -66,7 +65,10 @@ fn translate_char_to_morse(c: char) -> Option<String> {
     }
 }
 
+// Look up a string of morse code, returning the character it represents
 fn translate_morse_to_char(s: String) -> Option<char> {
+    // We have to loop here because we're using a map, which doesn't let you do
+    // a search based on values
     for key in CHARACTER_TO_MORSE.keys() {
         if CHARACTER_TO_MORSE.get(key).unwrap().to_string() == s {
             return Some(key.clone());
@@ -75,8 +77,8 @@ fn translate_morse_to_char(s: String) -> Option<char> {
     None
 }
 
-// Iterate through a string, translating each character one by one and returing
-// a fully translated string
+// Iterate through a string, translating each character/string of morse code one
+// by one and returning a fully translated string
 pub fn translate_string(untranslated: String, totext: bool) -> String {
     let mut translated = String::new();
     if !totext {
@@ -95,7 +97,7 @@ pub fn translate_string(untranslated: String, totext: bool) -> String {
             }
         }
     }
-    translated
+    translated.trim().to_string()
 }
 
 #[cfg(test)]
@@ -105,8 +107,16 @@ mod test {
     // Simple test comparing a translated "Hello, world!" to an online translator's
     // interpretation
     #[test]
-    fn hello_world_check() {
-        assert_eq!(translate_string("Hello, world!".to_string()),
-                   ".... . .-.. .-.. --- --..-- / .-- --- .-. .-.. -.. ");
+    fn to_morse() {
+        let untranslated = String::from("Hello, world!");
+        let translated = String::from(".... . .-.. .-.. --- --..-- / .-- --- .-. .-.. -..");
+        assert_eq!(translate_string(untranslated, false), translated);
+    }
+
+    #[test]
+    fn to_text() {
+        let translated = String::from("hello, world");
+        let untranslated = String::from(".... . .-.. .-.. --- --..-- / .-- --- .-. .-.. -..");
+        assert_eq!(translate_string(untranslated, true), translated);
     }
 }

@@ -8,12 +8,12 @@ use morse_code::translate_string;
 
 const USAGE: &'static str = "
 Usage:
-    morse [--totext]
+    morse [-t | --totext]
     morse (-h | --help)
 
 Options:
-    -h --help   Show this screen.
-    --totext    Translate from morse code to English
+    -h --help      Show this screen.
+    -t --totext    Translate from morse code to English
 ";
 
 fn main() {
@@ -30,7 +30,9 @@ fn main() {
         input = format!("{}{} ", input, line.unwrap().trim());
     }
 
+    // Translate input
+    let translated = translate_string(input.trim().to_string(), args.get_bool("--totext"));
+
     // Print result
-    println!("{}",
-             translate_string(input.trim().to_string(), args.get_bool("--totext")).trim());
+    println!("{}", translated);
 }
