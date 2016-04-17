@@ -58,23 +58,42 @@ static CHARACTER_TO_MORSE: phf::Map<char, &'static str> = phf_map! {
 
 // Look up a character in the map, returning the morse code translation if found
 // and "" if not
-fn translate_char(c: char) -> String {
-    CHARACTER_TO_MORSE.get(&c).unwrap_or(&"").to_string()
+fn translate_char_to_morse(c: char) -> Option<String> {
+    if CHARACTER_TO_MORSE.contains_key(&c) {
+        Some(CHARACTER_TO_MORSE.get(&c).unwrap().to_string())
+    } else {
+        None
+    }
+}
+
+fn translate_morse_to_char(s: String) -> Option<char> {
+    for key in CHARACTER_TO_MORSE.keys() {
+        if CHARACTER_TO_MORSE.get(key).unwrap().to_string() == s {
+            return Some(key.clone());
+        }
+    }
+    None
 }
 
 // Iterate through a string, translating each character one by one and returing
 // a fully translated string
-pub fn translate_string(untranslated: String) -> String {
+pub fn translate_string(untranslated: String, totext: bool) -> String {
     let mut translated = String::new();
-    for c in untranslated.to_lowercase().chars() {
-        let translated_char = translate_char(c);
-        translated = {
-            if translated_char != "" {
-                format!("{}{} ", translated, translated_char)
-            } else {
-                translated
+    if !totext {
+        for c in untranslated.to_lowercase().chars() {
+            match translate_char_to_morse(c) {
+                Some(translated_char) => translated = format!("{}{} ", translated, translated_char),
+                None => (),
             }
-        };
+        }
+    } else {
+        let untranslated_vec: Vec<&str> = untranslated.split(' ').collect();
+        for s in &untranslated_vec {
+            match translate_morse_to_char(s.to_string().clone()) {
+                Some(translated_morse) => translated.push(translated_morse),
+                None => (),
+            }
+        }
     }
     translated
 }
